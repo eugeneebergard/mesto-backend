@@ -1,5 +1,5 @@
-const express = require('express');
 const path = require('path');
+const express = require('express');
 const usersArr = require('./routes/users');
 const cardsArr = require('./routes/cards');
 

@@ -1,6 +1,6 @@
-const cardsRouter = require('express').Router();
-const fs = require('fs').promises;
 const path = require('path');
+const fs = require('fs').promises;
+const cardsRouter = require('express').Router();
 
 const cards = path.join(__dirname, '../data/cards.json');
 

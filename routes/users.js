@@ -1,6 +1,6 @@
-const usersRouter = require('express').Router();
-const fs = require('fs').promises;
 const path = require('path');
+const fs = require('fs').promises;
+const usersRouter = require('express').Router();
 
 const users = path.join(__dirname, '../data/users.json');
 
@@ -17,11 +17,10 @@ usersRouter.get('/:id', async (req, res) => {
   const user = await userId(req.params.id);
   if (user) {
     res.send(user);
-  } else {
-    res.status(404).send({
-      message: 'Нет пользователя с таким id',
-    });
+
+    return;
   }
+  res.status(404).send({ message: 'Нет пользователя с таким id' });
 });
 
 module.exports = usersRouter;
