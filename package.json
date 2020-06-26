@@ -1,10 +1,11 @@
 {
   "name": "backend-1",
-  "version": "0.0.1",
-  "description": "project-12",
+  "version": "0.0.2",
+  "description": "Yandex.Praktikum project-12",
   "main": "app.js",
   "scripts": {
-    "start": "nodemon app.js"
+    "dev": "nodemon app.js",
+    "start": "node app.js"
   },
   "keywords": [],
   "author": "Evgeny Ebergard",
