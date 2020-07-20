@@ -1,11 +1,19 @@
-const path = require('path');
+const mongoose = require('mongoose');
 const express = require('express');
-const usersArr = require('./routes/users');
-const cardsArr = require('./routes/cards');
+const bodyParser = require('body-parser');
+const usersRouter = require('./routes/users');
+const cardsRouter = require('./routes/cards');
 
 const { PORT = 3000 } = process.env;
 
 const app = express();
+
+mongoose.connect('mongodb://localhost:27017/mestodb', {
+  useNewUrlParser: true,
+  useCreateIndex: true,
+  useFindAndModify: false,
+  useUnifiedTopology: true,
+});
 
 const notFound = (req, res) => {
   if (!res.headersSent) {
@@ -15,9 +23,18 @@ const notFound = (req, res) => {
   }
 };
 
-app.use(express.static(path.join(__dirname, 'public')));
-app.use('/users', usersArr);
-app.use('/cards', cardsArr);
+app.use((req, res, next) => {
+  req.user = {
+    _id: '5f15e9a77a84711dd87a6f10',
+  };
+  next();
+});
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+app.use('/users', usersRouter);
+app.use('/cards', cardsRouter);
 app.use(notFound);
 
 app.listen(PORT);
