@@ -1,13 +1,9 @@
-const path = require('path');
-const fs = require('fs').promises;
 const cardsRouter = require('express').Router();
 
-const cards = path.join(__dirname, '../data/cards.json');
+const { getCards, createCard, deleteCard } = require('../controllers/cards');
 
-const cardsArr = async () => JSON.parse(await fs.readFile(cards, { encoding: 'utf8' }));
-
-cardsRouter.get('/', async (req, res) => {
-  res.send(await cardsArr());
-});
+cardsRouter.get('/', getCards);
+cardsRouter.post('/', createCard);
+cardsRouter.delete('/:cardId', deleteCard);
 
 module.exports = cardsRouter;
