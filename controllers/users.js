@@ -15,11 +15,13 @@ module.exports.createUser = (req, res) => {
     .catch(() => res.status(500).send({ message: 'Ошибка сервера' }));
 };
 
-module.exports.getUser = async function findById(req, res) {
-  const User = await user.findById(req.params.userId);
-  if (User == null) {
-    res.status(404).send({ message: 'Пользователь не найден' });
-    return;
+module.exports.getUser = async (req, res) => {
+  try {
+    const userObj = await user
+      .findById(req.params.userId)
+      .orFail(new Error(`Пользователь с таким _id ${req.params.userId} не найден`));
+    return res.json({ userObj });
+  } catch (err) {
+    return res.status(404).send({ message: err.message });
   }
-  res.send({ User });
 };
