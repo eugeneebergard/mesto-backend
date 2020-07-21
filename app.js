@@ -39,6 +39,5 @@ app.use('/cards', cardsRouter);
 app.use(notFound);
 
 app.listen(PORT, () => {
-  console.log('Ссылка на сервер:');
-  console.log(`localhost:${PORT}`);
+  console.log(`Ссылка на сервер: localhost:${PORT}`);
 });

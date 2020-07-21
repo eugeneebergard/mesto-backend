@@ -1,6 +1,6 @@
 {
   "name": "backend-1",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "Yandex.Praktikum project-13",
   "main": "app.js",
   "scripts": {
