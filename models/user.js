@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
-
-const reg = /^https?:\/\/(www\.)?(((?!www)\w([\w-]*\w)?\.)+([a-z]\w*)|(\d{1,3}\.){3}\d{1,3})(:\d+)?\/?(\/\w+)*(\/\w+(\.\w+)?(#|\/)?)*$/;
+const validator = require('validator');
 
 const usersSchema = new mongoose.Schema({
   name: {
@@ -18,9 +17,22 @@ const usersSchema = new mongoose.Schema({
   avatar: {
     type: String,
     validate: {
-      validator: (v) => reg.test(v),
+      validator: (v) => validator.isURL(v),
       message: 'Некорректный URL',
     },
+    required: true,
+  },
+  email: {
+    type: String,
+    required: true,
+    uniqoe: true,
+    validate: {
+      validator: (v) => validator.isEmail(v),
+      message: 'Некорректный адрес электронной почты',
+    },
+  },
+  password: {
+    type: String,
     required: true,
   },
 });

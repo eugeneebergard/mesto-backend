@@ -8,9 +8,13 @@ module.exports.getUsers = (req, res) => {
 };
 
 module.exports.createUser = (req, res) => {
-  const { name, about, avatar } = req.body;
+  const {
+    name, about, avatar, email, password,
+  } = req.body;
   user
-    .create({ name, about, avatar })
+    .create({
+      name, about, avatar, email, password,
+    })
     .then((users) => res.send({ data: users }))
     .catch(() => res.status(500).send({ message: 'Ошибка сервера' }));
 };
