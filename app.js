@@ -26,13 +26,6 @@ const notFound = (req, res) => {
   }
 };
 
-app.use((req, res, next) => {
-  req.user = {
-    _id: '5f15e9a77a84711dd87a6f10',
-  };
-  next();
-});
-
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -41,8 +34,8 @@ app.post('/signup', createUser);
 
 app.use(auth);
 
-app.use('/users', usersRouter);
-app.use('/cards', cardsRouter);
+app.use('/users', auth, usersRouter);
+app.use('/cards', auth, cardsRouter);
 
 app.use(notFound);
 
