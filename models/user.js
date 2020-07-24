@@ -27,7 +27,7 @@ const usersSchema = new mongoose.Schema({
   email: {
     type: String,
     required: true,
-    uniqoe: true,
+    unique: true,
     validate: {
       validator: (v) => validator.isEmail(v),
       message: 'Некорректный адрес электронной почты',
@@ -37,6 +37,7 @@ const usersSchema = new mongoose.Schema({
     type: String,
     required: true,
     select: false,
+    minlength: 8,
   },
 });
 

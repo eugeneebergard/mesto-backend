@@ -34,8 +34,8 @@ app.post('/signup', createUser);
 
 app.use(auth);
 
-app.use('/users', auth, usersRouter);
-app.use('/cards', auth, cardsRouter);
+app.use('/users', usersRouter);
+app.use('/cards', cardsRouter);
 
 app.use(notFound);
 
