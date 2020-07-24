@@ -1,4 +1,6 @@
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const key = require('../jwtcrypto');
 
 const user = require('../models/user');
 
@@ -30,4 +32,19 @@ module.exports.getUser = async (req, res) => {
   } catch (err) {
     return res.status(404).send({ message: err.message });
   }
+};
+
+module.exports.login = async (req, res) => {
+  const { email, password } = req.body;
+  if (password) {
+    return user.findUserByCredentials(email, password)
+      .then((userObj) => {
+        const token = jwt.sign({ _id: userObj._id }, key, { expiresIn: '7d' });
+        res.send({ token });
+      })
+      .catch((err) => {
+        res.status(401).send({ message: err.message });
+      });
+  }
+  return res.status(400).send({ message: 'Необходимо ввести пароль' });
 };

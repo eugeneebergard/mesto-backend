@@ -1,4 +1,6 @@
+const bcrypt = require('bcrypt');
 const mongoose = require('mongoose');
+const mongooseUniqueValidator = require('mongoose-unique-validator');
 const validator = require('validator');
 
 const usersSchema = new mongoose.Schema({
@@ -37,4 +39,22 @@ const usersSchema = new mongoose.Schema({
   },
 });
 
+// eslint-disable-next-line func-names
+usersSchema.statics.findUserByCredentials = function (email, password) {
+  return this.findOne({ email })
+    .select('+password')
+    .then((user) => {
+      if (!user) {
+        return Promise.reject(new Error('Неправильные почта или пароль'));
+      }
+      return bcrypt.compare(password, user.password).then((matched) => {
+        if (!matched) {
+          return Promise.reject(new Error('Неправильные почта или пароль'));
+        }
+        return user;
+      });
+    });
+};
+
+usersSchema.plugin(mongooseUniqueValidator, { message: 'Пользователь с таким E-Mail уже существует' });
 module.exports = mongoose.model('user', usersSchema);
