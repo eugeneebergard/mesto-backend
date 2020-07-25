@@ -1,18 +1,40 @@
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const key = require('../jwtsecret');
+
 const user = require('../models/user');
 
 module.exports.getUsers = (req, res) => {
   user
     .find({})
     .then((users) => res.send({ data: users }))
-    .catch(() => res.status(500).send({ message: 'Ошибка сервера' }));
+    .catch((err) => res.status(500).send({ message: err.message }));
 };
 
 module.exports.createUser = (req, res) => {
-  const { name, about, avatar } = req.body;
-  user
-    .create({ name, about, avatar })
-    .then((users) => res.send({ data: users }))
-    .catch(() => res.status(500).send({ message: 'Ошибка сервера' }));
+  const {
+    name, about, avatar, email, password,
+  } = req.body;
+  bcrypt.hash(password, 10)
+    .then((hash) => user.create({
+      name, about, avatar, email, password: hash,
+    }))
+    .then((users) => res.send({
+      data:
+      {
+        name: users.name,
+        about: users.about,
+        avatar: users.avatar,
+        email: users.email,
+      },
+    }))
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        res.status(400).send({ message: err.message });
+      } else {
+        res.status(500).send({ message: err.message });
+      }
+    });
 };
 
 module.exports.getUser = async (req, res) => {
@@ -24,4 +46,19 @@ module.exports.getUser = async (req, res) => {
   } catch (err) {
     return res.status(404).send({ message: err.message });
   }
+};
+
+module.exports.login = async (req, res) => {
+  const { email, password } = req.body;
+  if (password) {
+    return user.findUserByCredentials(email, password)
+      .then((userObj) => {
+        const token = jwt.sign({ _id: userObj._id }, key, { expiresIn: '7d' });
+        res.send({ token });
+      })
+      .catch((err) => {
+        res.status(401).send({ message: err.message });
+      });
+  }
+  return res.status(400).send({ message: 'Необходимо ввести пароль' });
 };

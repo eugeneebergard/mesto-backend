@@ -1,9 +1,10 @@
-/* eslint-disable no-console */
 const mongoose = require('mongoose');
 const express = require('express');
 const bodyParser = require('body-parser');
 const usersRouter = require('./routes/users');
 const cardsRouter = require('./routes/cards');
+const auth = require('./middlewares/auth');
+const { login, createUser } = require('./controllers/users');
 
 const { PORT = 3000 } = process.env;
 
@@ -24,20 +25,20 @@ const notFound = (req, res) => {
   }
 };
 
-app.use((req, res, next) => {
-  req.user = {
-    _id: '5f15e9a77a84711dd87a6f10',
-  };
-  next();
-});
-
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+app.post('/signin', login);
+app.post('/signup', createUser);
+
+app.use(auth);
+
 app.use('/users', usersRouter);
 app.use('/cards', cardsRouter);
+
 app.use(notFound);
 
 app.listen(PORT, () => {
+  // eslint-disable-next-line no-console
   console.log(`Ссылка на сервер: localhost:${PORT}`);
 });
