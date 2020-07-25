@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 const mongoose = require('mongoose');
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -40,5 +39,6 @@ app.use('/cards', cardsRouter);
 app.use(notFound);
 
 app.listen(PORT, () => {
+  // eslint-disable-next-line no-console
   console.log(`Ссылка на сервер: localhost:${PORT}`);
 });

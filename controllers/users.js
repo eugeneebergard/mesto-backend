@@ -1,6 +1,6 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const key = require('../jwtcrypto');
+const key = require('../jwtsecret');
 
 const user = require('../models/user');
 
@@ -19,7 +19,15 @@ module.exports.createUser = (req, res) => {
     .then((hash) => user.create({
       name, about, avatar, email, password: hash,
     }))
-    .then((users) => res.send({ data: users }))
+    .then((users) => res.send({
+      data:
+      {
+        name: users.name,
+        about: users.about,
+        avatar: users.avatar,
+        email: users.email,
+      },
+    }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(400).send({ message: err.message });

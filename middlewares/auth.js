@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const key = require('../jwtcrypto');
+const key = require('../jwtsecret');
 
 const handleAuthError = (res) => {
   res

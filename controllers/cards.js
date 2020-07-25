@@ -22,7 +22,7 @@ module.exports.createCard = (req, res) => {
     });
 };
 
-module.exports.deleteCard = async (req, res) => {
+module.exports.deleteCard = (req, res) => {
   if (!mongoose.Types.ObjectId.isValid(req.params.cardId)) {
     return res.status(400).send({ message: 'Некорректный ID' });
   }
@@ -34,8 +34,8 @@ module.exports.deleteCard = async (req, res) => {
         return res.status(403).send({ message: 'Вы не являетесь обладателем карточки' });
       }
       return card
-        .findByIdAndDelete(card._id)
-        .then((myCard) => res.send({ data: myCard, message: 'Карточка удалена' }))
+        .findByIdAndDelete(req.params.cardId)
+        .then(() => res.send({ message: 'Карточка удалена' }))
         .catch((err) => res.status(404).send({ message: err.message }));
     })
     .catch((err) => res.status(404).send({ message: err.message }));
