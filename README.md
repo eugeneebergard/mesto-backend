@@ -2,7 +2,8 @@
 
 ### Version 0.1.8
 
-### Публичный IP адресс: [ebergardmesto.tk](https://ebergardmesto.tk)
+### Домен: [ebergardmesto.tk](https://ebergardmesto.tk), [api.ebergardmesto.tk](https://api.ebergardmesto.tk)
+### Публичный IP адресс: [130.193.39.204](https://130.193.39.204)
 
 ## Процесс установки:
 
