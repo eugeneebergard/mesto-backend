@@ -1,21 +1,30 @@
+const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const key = require('../jwtsecret');
 
+const BadRequest = require('../errors/badRequest');
+const Conflict = require('../errors/conflict');
+const NotFound = require('../errors/notFound');
 const user = require('../models/user');
 
-module.exports.getUsers = (req, res) => {
+const { JWT_SECRET, NODE_ENV } = process.env;
+
+module.exports.getUsers = (req, res, next) => {
   user
     .find({})
     .then((users) => res.send({ data: users }))
-    .catch((err) => res.status(500).send({ message: err.message }));
+    .catch(next);
 };
 
-module.exports.createUser = (req, res) => {
+module.exports.createUser = (req, res, next) => {
   const {
     name, about, avatar, email, password,
   } = req.body;
-  bcrypt.hash(password, 10)
+  if (!password || password.length < 8) {
+    throw new BadRequest('Задайте пароль не менее 8 символов');
+  }
+  return bcrypt
+    .hash(password, 10)
     .then((hash) => user.create({
       name, about, avatar, email, password: hash,
     }))
@@ -30,35 +39,38 @@ module.exports.createUser = (req, res) => {
     }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({ message: err.message });
-      } else {
-        res.status(500).send({ message: err.message });
+        if (err.errors.email && err.errors.email.kind === 'unique') {
+          throw new Conflict('Пользователь с таким E-mail уже существует');
+        } else {
+          throw new BadRequest('Неверный синтаксис');
+        }
       }
-    });
+    })
+    .catch(next);
 };
 
-module.exports.getUser = async (req, res) => {
-  try {
-    const userObj = await user
-      .findById(req.params.userId)
-      .orFail(new Error(`Пользователь с таким _id ${req.params.userId} не найден`));
-    return res.json({ userObj });
-  } catch (err) {
-    return res.status(404).send({ message: err.message });
+module.exports.getUser = async (req, res, next) => {
+  if (!mongoose.Types.ObjectId.isValid(req.params.userId)) {
+    throw new BadRequest('Некорректный ID');
   }
+  user
+    .findById(req.params.userId)
+    .orFail(new NotFound('Пользователь с таким id не найден'))
+    .then((userr) => {
+      res.send(userr);
+    })
+    .catch(next);
 };
 
-module.exports.login = async (req, res) => {
+module.exports.login = async (req, res, next) => {
   const { email, password } = req.body;
   if (password) {
     return user.findUserByCredentials(email, password)
       .then((userObj) => {
-        const token = jwt.sign({ _id: userObj._id }, key, { expiresIn: '7d' });
+        const token = jwt.sign({ _id: userObj._id }, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret', { expiresIn: '7d' });
         res.send({ token });
       })
-      .catch((err) => {
-        res.status(401).send({ message: err.message });
-      });
+      .catch(next);
   }
   return res.status(400).send({ message: 'Необходимо ввести пароль' });
 };
